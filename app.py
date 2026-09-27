@@ -161,12 +161,9 @@ else:
                     "text/plain"
                 )
 
-            except yt_dlp.utils.DownloadError:
+            except yt_dlp.utils.DownloadError as e:
 
-                st.error(
-                    "Could not download this video. "
-                    "Check the URL or try another video."
-                )
+                st.error(f"YouTube download failed: {e}")
 
             except Exception as e:
 
