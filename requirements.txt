@@ -1,0 +1,12 @@
+langchain
+langchain-core
+langchain-community
+langchain-groq
+langgraph
+ffmpeg-python
+faster-whisper
+python-dotenv
+streamlit
+requests
+langchain-text-splitters
+dotenv 

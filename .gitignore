@@ -1,0 +1,35 @@
+# Environment
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated files
+uploads/
+outputs/
+transcripts/
+temp/
+
+# Models
+models/
+*.bin
+*.pt
+*.pth
+*.safetensors
+
+# Vector database
+VectorDB/
+chroma/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
