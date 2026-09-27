@@ -9,4 +9,4 @@ python-dotenv
 streamlit
 requests
 langchain-text-splitters
-dotenv 
+yt-dlp

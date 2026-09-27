@@ -38,75 +38,31 @@ if option == "Upload Video":
 
     if uploaded_file is not None:
 
-        with open(video_path, "wb") as file:
-            file.write(uploaded_file.getbuffer())
+        try:
 
-        st.success("Video uploaded successfully!")
+            # Remove previous video
+            if os.path.exists(video_path):
+                os.remove(video_path)
+
+            with open(video_path, "wb") as file:
+                file.write(uploaded_file.getbuffer())
+
+            st.success("Video uploaded successfully!")
+
+        except Exception as e:
+
+            st.error(f"Upload failed: {e}")
 
         if st.button("Generate Notes"):
 
-            with st.spinner("Generating notes..."):
-
-                notes_path = process_video(video_path)
-
-            with open(notes_path, "r", encoding="utf-8") as file:
-                notes = file.read()
-
-            st.success("Notes generated!")
-
-            st.markdown("## 📝 Generated Notes")
-            st.markdown(notes)
-
-            st.download_button(
-                "Download Notes",
-                notes,
-                "notes.txt",
-                "text/plain"
-            )
-
-
-# =====================================================
-# VIDEO URL
-# =====================================================
-
-else:
-
-    video_url = st.text_input(
-        "Paste YouTube URL",
-        placeholder="https://youtu.be/YMAwgRwjEOQ"
-    )
-
-    if st.button("Generate Notes from URL"):
-
-        if not video_url.strip():
-
-            st.error("Please enter a YouTube URL.")
-
-        else:
-
             try:
-
-                # Remove previous video
-                if os.path.exists(video_path):
-                    os.remove(video_path)
-
-                with st.spinner("Downloading video..."):
-
-                    ydl_opts = {
-                        "format": "bestvideo+bestaudio/best",
-                        "outtmpl": video_path,
-                        "noplaylist": True,
-                        "merge_output_format": "mp4"
-                    }
-
-                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        ydl.download([video_url.strip()])
-
-                st.success("New video downloaded!")
 
                 with st.spinner("Generating notes..."):
 
                     notes_path = process_video(video_path)
+
+                if not os.path.exists(notes_path):
+                    raise Exception("Notes file was not created.")
 
                 with open(
                     notes_path,
@@ -130,4 +86,88 @@ else:
 
             except Exception as e:
 
-                st.error(f"Error: {e}")
+                st.error(f"Processing failed: {e}")
+
+
+# =====================================================
+# VIDEO URL
+# =====================================================
+
+else:
+
+    video_url = st.text_input(
+        "Paste YouTube URL",
+        placeholder="https://youtu.be/YMAwgRwjEOQ"
+    )
+
+    if st.button("Generate Notes from URL"):
+
+        if not video_url.strip():
+
+            st.warning("Please enter a YouTube URL.")
+
+        else:
+
+            try:
+
+                # Remove previous video
+                if os.path.exists(video_path):
+                    os.remove(video_path)
+
+                with st.spinner("Downloading video..."):
+
+                    ydl_opts = {
+                        "format": "bestvideo+bestaudio/best",
+                        "outtmpl": video_path,
+                        "noplaylist": True,
+                        "merge_output_format": "mp4"
+                    }
+
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        ydl.download([video_url.strip()])
+
+                # Check download
+                if not os.path.exists(video_path):
+                    raise Exception(
+                        "Video download completed, but the video file was not found."
+                    )
+
+                st.success("Video downloaded!")
+
+                with st.spinner("Generating notes..."):
+
+                    notes_path = process_video(video_path)
+
+                if not os.path.exists(notes_path):
+                    raise Exception("Notes file was not created.")
+
+                with open(
+                    notes_path,
+                    "r",
+                    encoding="utf-8"
+                ) as file:
+
+                    notes = file.read()
+
+                st.success("Notes generated!")
+
+                st.markdown("## 📝 Generated Notes")
+                st.markdown(notes)
+
+                st.download_button(
+                    "Download Notes",
+                    notes,
+                    "notes.txt",
+                    "text/plain"
+                )
+
+            except yt_dlp.utils.DownloadError:
+
+                st.error(
+                    "Could not download this video. "
+                    "Check the URL or try another video."
+                )
+
+            except Exception as e:
+
+                st.error(f"Processing failed: {e}")
