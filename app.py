@@ -117,11 +117,15 @@ else:
                 with st.spinner("Downloading video..."):
 
                     ydl_opts = {
-                        "format": "bestvideo+bestaudio/best",
-                        "outtmpl": video_path,
-                        "noplaylist": True,
-                        "merge_output_format": "mp4"
-                    }
+        "format": "best",
+        "outtmpl": video_path,
+        "noplaylist": True,
+        "extractor_args": {
+            "youtube": {
+            "player_client": ["android"]
+            }
+        }
+        }
 
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         ydl.download([video_url.strip()])
